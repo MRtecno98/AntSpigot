@@ -1,0 +1,74 @@
+<project name="HelloWorld" basedir="." default="main">
+	
+	<property name="version" value="1.0.0" />
+	
+	<property name="src.dir" value="src" />
+	
+	<property name="resources.dir" value="resources" />
+	<property name="resources.dir.parent" value="." />
+	
+	<property name="build.dir" value="build" />
+	<property name="classes.dir" value="${build.dir}/classes" />
+	<property name="jar.dir" value="${build.dir}/jar" />
+	
+	<property name="lib.dir" value="lib" />
+	
+	<property name="server.dir" value="server" />
+	<property name="server.plugins.dir" value="${server.dir}/plugins" />
+	
+	<tstamp>
+	    <format property="build.time" pattern="yyyy-MM-dd'T'HH:mm:ss.SSSXXX"/>
+	</tstamp>
+	
+	<path id="classpath">
+		<fileset dir="${lib.dir}" includes="**/*.jar" />
+	</path>
+	
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+	
+	<target name="clean-server">
+		<delete includeEmptyDirs="true">
+			<fileset dir="${server.dir}" >
+				<include name="**/*" />
+				<exclude name="eula.txt" />
+				<exclude name="plugins" />
+			</fileset>
+		</delete>
+	</target>
+	
+	<target name="compile">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" />
+		
+		<copy todir="${classes.dir}" >
+		    <fileset dir="${resources.dir}">  
+		        <include name="**/**"/>
+		    </fileset>
+			<filterset>
+				<filter token="projectname" value="${ant.project.name}" />
+				<filter token="version" value="${version}" />
+				<filter token="buildtime" value="${build.time}" />
+			</filterset>
+		</copy>
+	</target>
+	
+	<target name="export" depends="compile">
+		<mkdir dir="${jar.dir}" />
+		<jar destfile="${jar.dir}/${ant.project.name}.jar" basedir="${classes.dir}" />
+	</target>
+	
+	<target name="jar-local" depends="compile">
+		<mkdir dir="${server.plugins.dir}" />
+		<jar destfile="${server.plugins.dir}/${ant.project.name}.jar" basedir="${classes.dir}" />
+	</target>
+	
+	<target name="clean-all" depends="clean, clean-server" />
+	
+	<target name="clean-build" depends="clean, jar-local" />
+	
+	<target name="clean-export" depends="clean, export" />
+	
+	<target name="main" depends="clean-build" />
+</project>

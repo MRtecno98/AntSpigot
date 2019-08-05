@@ -1,0 +1,7 @@
+name: "@projectname@"
+main: antest.HelloWorld
+description: First plugin with Ant
+version: "@version@"
+commands:
+   helloworld:
+      description: Greets the user
